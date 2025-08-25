@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    ports: [ "6379:6379" ]
 
   livekit:
     image: livekit/livekit-server:latest
@@ -16,9 +13,10 @@ services:
       --rtc.port 7882
       --node-ip 0.0.0.0
     ports:
-      - "7880:7880"
+      - "7880:7880"   # HTTP/WS (dev) - use TLS in prod
       - "7882:7882/udp"
-    env_file: .env
+    environment:
+      LIVEKIT_KEYS: devkey:devsecret
 
   turn:
     image: coturn/coturn:latest
@@ -28,35 +26,24 @@ services:
       --fingerprint
       --lt-cred-mech
       --realm=localhost
-      --user=${TURN_USERNAME}:${TURN_PASSWORD}
+      --user=webrtc:supersecretpassword
       --listening-port=3478
       --no-loopback-peers
       --no-multicast-peers
     ports:
       - "3478:3478/udp"
       - "3478:3478/tcp"
-    env_file: .env
 
   server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    build: ./server
     restart: unless-stopped
     env_file: .env
-    depends_on:
-      - redis
-      - livekit
-      - turn
-    ports:
-      - "5000:5000"
+    depends_on: [ redis, livekit, turn ]
+    ports: [ "8080:8080" ]
 
   web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
+    build: ./web
     restart: unless-stopped
     env_file: .env
-    depends_on:
-      - server
-    ports:
-      - "3000:3000"
+    depends_on: [ server ]
+    ports: [ "5173:5173" ]
