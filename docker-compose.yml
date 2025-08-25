@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  livekit:
+    image: livekit/livekit-server:latest
+    restart: unless-stopped
+    command: >
+      --dev
+      --bind 0.0.0.0:7880
+      --rtc.port 7882
+      --node-ip 0.0.0.0
+    ports:
+      - "7880:7880"
+      - "7882:7882/udp"
+    env_file: .env
+
+  turn:
+    image: coturn/coturn:latest
+    restart: unless-stopped
+    command: >
+      -n --no-cli
+      --fingerprint
+      --lt-cred-mech
+      --realm=localhost
+      --user=${TURN_USERNAME}:${TURN_PASSWORD}
+      --listening-port=3478
+      --no-loopback-peers
+      --no-multicast-peers
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+    env_file: .env
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - redis
+      - livekit
+      - turn
+    ports:
+      - "5000:5000"
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
