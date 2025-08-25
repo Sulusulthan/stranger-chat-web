@@ -1,0 +1,49 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports: [ "6379:6379" ]
+
+  livekit:
+    image: livekit/livekit-server:latest
+    restart: unless-stopped
+    command: >
+      --dev
+      --bind 0.0.0.0:7880
+      --rtc.port 7882
+      --node-ip 0.0.0.0
+    ports:
+      - "7880:7880"   # HTTP/WS (dev) - use TLS in prod
+      - "7882:7882/udp"
+    environment:
+      LIVEKIT_KEYS: devkey:devsecret
+
+  turn:
+    image: coturn/coturn:latest
+    restart: unless-stopped
+    command: >
+      -n --no-cli
+      --fingerprint
+      --lt-cred-mech
+      --realm=localhost
+      --user=webrtc:supersecretpassword
+      --listening-port=3478
+      --no-loopback-peers
+      --no-multicast-peers
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+
+  server:
+    build: ./server
+    restart: unless-stopped
+    env_file: .env
+    depends_on: [ redis, livekit, turn ]
+    ports: [ "8080:8080" ]
+
+  web:
+    build: ./web
+    restart: unless-stopped
+    env_file: .env
+    depends_on: [ server ]
+    ports: [ "5173:5173" ]

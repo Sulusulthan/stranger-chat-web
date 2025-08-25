@@ -1,0 +1,24 @@
+{
+  "name": "stranger-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.4.1",
+    "joi": "^17.12.3",
+    "livekit-server-sdk": "^2.4.0",
+    "node-fetch": "^3.3.2",
+    "uid-safe": "^2.1.5",
+    "ws": "^8.18.0",
+    "geoip-lite": "^1.4.7"
+  }
+}
