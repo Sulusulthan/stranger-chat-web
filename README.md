@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Stranger Video + Chat — Full Stack (LiveKit + Redis + TURN)
 
 This project implements a production-ready baseline for a **random 1:1 stranger chat** with video, text, safety features, and compliance scaffolding.
@@ -63,3 +64,6 @@ Open the web app in **two browser tabs**. Click **Start**, allow camera/mic, and
 - Wire **recordings** and storage (S3/GCS) if you enable it.
 - Enforce **rate limits**, abuse scoring, and moderation workflows.
 - Maintain **audit logs** (anonymized where possible, encrypted at rest).
+=======
+# stranger-chat-web
+>>>>>>> 820a4fecbdc2f439d44bbebc2172649a7f4eaef0
