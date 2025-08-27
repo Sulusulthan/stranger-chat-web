@@ -1,14 +1,17 @@
 {
   "version": 2,
-  "env": {
-    "NPM_CONFIG_PRODUCTION": "false"
+  "build": {
+    "env": {
+      "NPM_CONFIG_PRODUCTION": "false",
+      "NODE_ENV": "development"
+    }
   },
   "builds": [
     {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "installCommand": "npm ci",
+        "installCommand": "npm ci --include=dev",
         "buildCommand": "npm run build",
         "distDir": "dist"
       }
