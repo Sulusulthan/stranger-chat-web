@@ -13,8 +13,9 @@ import {
 import '@livekit/components-styles';
 import './index.css';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/match';
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || 'http://localhost:8080';
+const WS_URL = 'wss://stranger-backend-fuo7.onrender.com/match';
+const API_ORIGIN = 'https://stranger-backend-fuo7.onrender.com';
+const LIVEKIT_URL = 'wss://strangerchat-46rk6pjg.livekit.cloud';
 
 function TrackGrid() {
   const tracks = useTracks(
@@ -55,6 +56,7 @@ function App() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
+    if (!WS_URL) return; // do not open WS unless configured
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
     ws.onopen = () => setConnected(true);
@@ -206,7 +208,7 @@ function App() {
               video
               audio
               token={tokenString}
-              serverUrl={import.meta.env.VITE_LIVEKIT_URL || undefined}
+              serverUrl={LIVEKIT_URL}
               connect
               data-lk-theme="default"
               style={{ height: 520 }}
