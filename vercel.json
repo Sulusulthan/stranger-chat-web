@@ -1,6 +1,17 @@
 {
   "version": 2,
+  "env": {
+    "NPM_CONFIG_PRODUCTION": "false"
+  },
   "builds": [
-    { "src": "package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "installCommand": "npm ci",
+        "buildCommand": "npm run build",
+        "distDir": "dist"
+      }
+    }
   ]
 }
