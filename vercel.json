@@ -1,20 +1,6 @@
 {
   "version": 2,
-  "build": {
-    "env": {
-      "NPM_CONFIG_PRODUCTION": "false",
-      "NODE_ENV": "development"
-    }
-  },
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "installCommand": "npm ci --include=dev",
-        "buildCommand": "npm run build",
-        "distDir": "dist"
-      }
-    }
-  ]
+  "framework": "vite",
+  "buildCommand": "npm ci && npm run build",
+  "outputDirectory": "dist"
 }
