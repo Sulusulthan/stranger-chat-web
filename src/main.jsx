@@ -39,6 +39,8 @@ function TrackGrid() {
 function App() {
   const [room, setRoom] = useState(null);
   const [token, setToken] = useState(null);
+  // normalize token for LiveKit (ensure string)
+  const tokenString = typeof token === 'string' ? token : (token && typeof token.token === 'string' ? token.token : null);
   const [queued, setQueued] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [tags, setTags] = useState(['random']);
@@ -173,7 +175,7 @@ function App() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 card">
-          {!token ? (
+          {!tokenString ? (
             <div className="space-y-3">
               <p>
                 Click <b>Start</b> to join the queue and get matched with a
@@ -203,7 +205,7 @@ function App() {
             <LiveKitRoom
               video
               audio
-              token={token}
+              token={tokenString}
               serverUrl={import.meta.env.VITE_LIVEKIT_URL || undefined}
               connect
               data-lk-theme="default"
