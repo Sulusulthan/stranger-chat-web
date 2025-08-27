@@ -7,7 +7,8 @@ import {
   ControlBar,
   useTracks,
   ParticipantTile,
-  TrackReference
+  TrackReference,
+  VideoConference
 } from '@livekit/components-react';
 
 import '@livekit/components-styles';
@@ -217,28 +218,7 @@ function App() {
                 setRoom(null);
               }}
             >
-              <div className="h-full flex flex-col">
-                <TrackGrid />
-                <RoomAudioRenderer />
-                <ControlBar
-                  variation="minimal"
-                  controls={{ screenShare: false, leave: true }}
-                />
-                <div className="mt-2 flex gap-2">
-                  <button className="btn-secondary" onClick={next} disabled={!connected || cooldown > 0}>
-                    Next
-                  </button>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => setToken(null)}
-                  >
-                    Disconnect
-                  </button>
-                  <button className="btn-secondary" onClick={report}>
-                    Report
-                  </button>
-                </div>
-              </div>
+              <VideoConference />
             </LiveKitRoom>
           )}
         </div>
