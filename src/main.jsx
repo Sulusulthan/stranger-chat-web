@@ -93,22 +93,43 @@ function App() {
     );
   }, [interestInput]);
 
-  const start = () => {
-    wsRef.current?.send(
-      JSON.stringify({
-        type: 'find',
-        tags,
-        lang,
-        countryBias,
-        recaptchaToken: captchaToken
-      })
-    );
+  const start = async () => {
+    try {
+      const roomName = 'public';
+      const participantName = 'guest-' + Math.random().toString(36).slice(2, 8);
+      const res = await fetch(API_ORIGIN + '/get-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomName, participantName })
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error('token_request_failed: ' + txt);
+      }
+      const data = await res.json();
+      setToken(data.token);
+      setRoom(roomName);
+      setQueued(false);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to start: ' + (err?.message || 'unknown_error'));
+    }
   };
   const next = () => {
-    wsRef.current?.send(JSON.stringify({ type: 'next' }));
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'next' }));
+    } else {
+      console.warn('WS not open; ignoring next');
+    }
   };
   const leave = () => {
-    wsRef.current?.send(JSON.stringify({ type: 'leave' }));
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'leave' }));
+    } else {
+      console.warn('WS not open; ignoring leave');
+    }
   };
   const report = async () => {
     const reason = prompt('Report reason:', reportReason || 'abuse');
@@ -165,11 +186,11 @@ function App() {
                 <button
                   className="btn-secondary"
                   onClick={next}
-                  disabled={cooldown > 0}
+                  disabled={cooldown > 0 || !connected}
                 >
                   Next
                 </button>
-                <button className="btn-secondary" onClick={leave}>
+                <button className="btn-secondary" onClick={leave} disabled={!connected}>
                   Leave
                 </button>
                 {cooldown > 0 && (
@@ -199,7 +220,7 @@ function App() {
                 controls={{ screenShare: false, leave: true }}
               />
               <div className="mt-2 flex gap-2">
-                <button className="btn-secondary" onClick={next}>
+                <button className="btn-secondary" onClick={next} disabled={!connected || cooldown > 0}>
                   Next
                 </button>
                 <button
